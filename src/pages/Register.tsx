@@ -31,7 +31,6 @@ export default function Register() {
 
     try {
       await register({ email, userName, password })
-      navigate('/dashboard', { replace: true })
     } catch (err) {
       setError(getApiErrorMessage(err, 'Registration failed. Please try again.'))
     } finally {

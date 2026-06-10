@@ -30,7 +30,6 @@ export default function Login() {
 
     try {
       await login({ email, password })
-      navigate('/dashboard', { replace: true })
     } catch (err) {
       setError(getApiErrorMessage(err, 'Login failed. Please check your credentials.'))
     } finally {

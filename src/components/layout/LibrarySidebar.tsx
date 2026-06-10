@@ -9,7 +9,7 @@ interface LibrarySidebarProps {
 }
 
 export default function LibrarySidebar({ mobileOpen, onClose }: LibrarySidebarProps) {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isAdmin } = useAuth()
   const [adminVisible, setAdminVisible] = useState(true)
 
   const content = (
@@ -33,19 +33,29 @@ export default function LibrarySidebar({ mobileOpen, onClose }: LibrarySidebarPr
         </ul>
       </nav>
 
-      {isAuthenticated && adminVisible && (
+      {isAuthenticated && isAdmin && adminVisible && (
         <div className="border-t border-sidebar-border pt-6">
           <h2 className="font-display mb-4 tracking-wide text-sidebar-primary">Panel de Administración</h2>
           <ul className="space-y-2">
             {ADMIN_LINKS.map((link) => (
               <li key={link.label}>
-                <a
-                  href={link.href}
-                  onClick={onClose}
-                  className="font-ui block rounded-sm border border-transparent px-3 py-2 text-sidebar-primary/70 transition-all hover:border-sidebar-primary/20 hover:bg-primary/10 hover:text-sidebar-primary"
-                >
-                  {link.label}
-                </a>
+                {link.href.startsWith('/') ? (
+                  <Link
+                    to={link.href}
+                    onClick={onClose}
+                    className="font-ui block rounded-sm border border-transparent px-3 py-2 text-sidebar-primary/70 transition-all hover:border-sidebar-primary/20 hover:bg-primary/10 hover:text-sidebar-primary"
+                  >
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    href={link.href}
+                    onClick={onClose}
+                    className="font-ui block rounded-sm border border-transparent px-3 py-2 text-sidebar-primary/70 transition-all hover:border-sidebar-primary/20 hover:bg-primary/10 hover:text-sidebar-primary"
+                  >
+                    {link.label}
+                  </a>
+                )}
               </li>
             ))}
             <li>
@@ -61,7 +71,7 @@ export default function LibrarySidebar({ mobileOpen, onClose }: LibrarySidebarPr
         </div>
       )}
 
-      {isAuthenticated && (
+      {isAuthenticated && isAdmin && (
         <div className="border-t border-sidebar-border pt-6">
           <button
             type="button"

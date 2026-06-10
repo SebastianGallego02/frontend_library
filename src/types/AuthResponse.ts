@@ -3,5 +3,6 @@ import type { User } from './User'
 /** JWT login/register response from POST /Auth/login and POST /Auth/register */
 export interface AuthResponse {
   token: string
-  user: User
+  refreshToken?: string
+  user?: User
 }

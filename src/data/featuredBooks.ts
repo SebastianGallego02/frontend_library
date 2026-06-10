@@ -31,7 +31,7 @@ export const CATEGORIES = [
 ] as const
 
 export const ADMIN_LINKS = [
-  { label: 'Devoluciones', href: '#' },
-  { label: 'Sanciones', href: '#' },
-  { label: 'Préstamos', href: '#' },
+  { label: 'Libros', href: '/books' },
+  { label: 'Sanciones', href: '/admin/sanctions' },
+  { label: 'Préstamos', href: '/admin/loans' },
 ] as const
