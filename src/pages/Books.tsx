@@ -1,13 +1,14 @@
 import { type FormEvent, useCallback, useEffect, useState } from 'react'
 import FormField from '../components/common/FormField'
 import { bookService } from '../services/book.service'
-import type { Book } from '../types/Book'
+import type { Book, CreateBookRequest } from '../types/Book'
 import { getApiErrorMessage } from '../utils/apiError'
 
 const emptyForm = {
   title: '',
   author: '',
   description: '',
+  imageUrl: '', // Nuevo campo para la URL de la imagen
   publishedYear: '',
   available: true,
   copies: '1',
@@ -57,6 +58,7 @@ export default function Books() {
       publishedYear: String(book.publishedYear),
       available: book.available,
       copies: String(book.copies ?? 1),
+      imageUrl: book.imageUrl ?? '', // Cargar la URL de la imagen
     })
     setError('')
   }
@@ -80,13 +82,14 @@ export default function Books() {
     setSubmitting(true)
     setError('')
 
-    const payload = {
+    const payload: CreateBookRequest = {
       title: form.title,
       author: form.author,
       description: form.description || null,
       publishedYear: Number(form.publishedYear),
       available: form.available,
-      TotalCopies: Number(form.copies),
+      totalCopies: Number(form.copies), // Aseguramos que el nombre de la propiedad coincida con el backend
+      imageUrl: form.imageUrl || null, // Incluir la URL de la imagen
     }
 
     try {
@@ -156,6 +159,13 @@ export default function Books() {
             name="description"
             value={form.description}
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+          />
+          <FormField
+            label="URL de la imagen de portada"
+            name="imageUrl"
+            value={form.imageUrl}
+            onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))}
+            placeholder="Ej: https://ejemplo.com/portada.jpg"
           />
           <FormField
             label="Número de copias"

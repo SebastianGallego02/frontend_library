@@ -2,15 +2,11 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import api from '../services/api'
 import { bookService } from '../services/book.service'
+import type { Book } from '../types/Book' // Importamos la interfaz Book centralizada
+import { getApiErrorMessage } from '../utils/apiError'
 
-type Book = {
-  id: string
-  title: string
-  author: string
-  year: number
-  imageUrl: string
-  available?: boolean
-}
+/** Imagen por defecto en caso de que el libro no tenga una URL válida */
+const DEFAULT_BOOK_IMAGE = 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80'
 
 const FALLBACK_BOOKS: Book[] = [
   {
@@ -18,7 +14,7 @@ const FALLBACK_BOOKS: Book[] = [
     title: 'La noche en que lo mismo ocurrió',
     author: 'María Sánchez',
     year: 2019,
-    imageUrl: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80',
+    imageUrl: DEFAULT_BOOK_IMAGE,
     available: true,
   },
   {
@@ -102,16 +98,11 @@ export default function Home() {
           console.log('Home: reemplazando libros estáticos con datos reales', maybeBooks)
           setBooks(
             maybeBooks.map((item) => ({
-              id: String((item as any).id),
+              id: Number((item as any).id), // Aseguramos que el ID sea numérico
               title: String((item as any).title ?? ''),
               author: String((item as any).author ?? 'Desconocido'),
               year: Number((item as any).publishedYear ?? (item as any).year ?? new Date().getFullYear()),
-              imageUrl:
-                String(
-                  (item as any).imageUrl ??
-                    (item as any).coverUrl ??
-                    'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80',
-                ),
+              imageUrl: (item as any).imageUrl || (item as any).coverUrl || DEFAULT_BOOK_IMAGE,
               available: (item as any).available ?? true,
             })),
           )
@@ -190,6 +181,9 @@ export default function Home() {
       } else {
         setLoanError('No se pudo completar el préstamo.')
       }
+      // Usamos la utilidad centralizada para mostrar el mensaje preciso del backend
+      // Esto capturará automáticamente el error 400 y el mensaje que definiste.
+      setLoanError(getApiErrorMessage(error, 'No se pudo completar el préstamo.'))
     } finally {
       setIsLoaning(false)
     }
@@ -221,9 +215,18 @@ export default function Home() {
               src={book.imageUrl}
               alt={`Portada de ${book.title}`}
               className="h-52 w-full object-cover"
+              // Si la URL falla (404, etc), cargamos la imagen por defecto
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = DEFAULT_BOOK_IMAGE
+              }}
             />
             <div className="p-4">
-              <h2 className="font-display text-lg leading-tight text-foreground">{book.title}</h2>
+              <h2 
+                className="font-display text-lg leading-tight text-foreground truncate" 
+                title={book.title}
+              >
+                {book.title}
+              </h2>
               <p className="mt-2 text-sm text-muted-foreground">{book.author}</p>
               <p className="mt-1 text-xs uppercase tracking-[.18em] text-primary">{book.year}</p>
               <button
